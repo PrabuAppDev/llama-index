@@ -21,39 +21,7 @@
     Requirement already satisfied: pydantic-core==2.20.1 in c:\programdata\anaconda3\lib\site-packages (from pydantic<3,>=1.9.0->openai) (2.20.1)
     Requirement already satisfied: colorama in c:\programdata\anaconda3\lib\site-packages (from tqdm>4->openai) (0.4.6)
     Defaulting to user installation because normal site-packages is not writeable
-    Collecting pymupdf
-      Downloading PyMuPDF-1.24.12-cp39-abi3-win_amd64.whl.metadata (3.4 kB)
-    Downloading PyMuPDF-1.24.12-cp39-abi3-win_amd64.whl (16.0 MB)
-       ---------------------------------------- 0.0/16.0 MB ? eta -:--:--
-       ---------------------------------------- 0.0/16.0 MB ? eta -:--:--
-        --------------------------------------- 0.3/16.0 MB ? eta -:--:--
-       - -------------------------------------- 0.8/16.0 MB 1.4 MB/s eta 0:00:11
-       -- ------------------------------------- 1.0/16.0 MB 1.5 MB/s eta 0:00:11
-       --- ------------------------------------ 1.6/16.0 MB 1.7 MB/s eta 0:00:09
-       ----- ---------------------------------- 2.1/16.0 MB 1.8 MB/s eta 0:00:08
-       ------ --------------------------------- 2.6/16.0 MB 2.0 MB/s eta 0:00:07
-       ------- -------------------------------- 3.1/16.0 MB 2.1 MB/s eta 0:00:07
-       --------- ------------------------------ 3.9/16.0 MB 2.3 MB/s eta 0:00:06
-       ----------- ---------------------------- 4.5/16.0 MB 2.4 MB/s eta 0:00:05
-       ------------- -------------------------- 5.2/16.0 MB 2.5 MB/s eta 0:00:05
-       -------------- ------------------------- 5.8/16.0 MB 2.5 MB/s eta 0:00:05
-       ----------------- ---------------------- 6.8/16.0 MB 2.7 MB/s eta 0:00:04
-       ------------------- -------------------- 7.6/16.0 MB 2.8 MB/s eta 0:00:03
-       --------------------- ------------------ 8.7/16.0 MB 2.9 MB/s eta 0:00:03
-       ------------------------ --------------- 9.7/16.0 MB 3.1 MB/s eta 0:00:03
-       -------------------------- ------------- 10.5/16.0 MB 3.2 MB/s eta 0:00:02
-       ---------------------------- ----------- 11.5/16.0 MB 3.3 MB/s eta 0:00:02
-       ------------------------------ --------- 12.3/16.0 MB 3.3 MB/s eta 0:00:02
-       -------------------------------- ------- 13.1/16.0 MB 3.3 MB/s eta 0:00:01
-       ----------------------------------- ---- 14.2/16.0 MB 3.4 MB/s eta 0:00:01
-       -------------------------------------- - 15.2/16.0 MB 3.5 MB/s eta 0:00:01
-       ---------------------------------------- 16.0/16.0 MB 3.5 MB/s eta 0:00:00
-    Installing collected packages: pymupdf
-    Successfully installed pymupdf-1.24.12
-    
-
-      WARNING: The script pymupdf.exe is installed in 'C:\Users\prabu\AppData\Roaming\Python\Python312\Scripts' which is not on PATH.
-      Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+    Requirement already satisfied: pymupdf in c:\users\prabu\appdata\roaming\python\python312\site-packages (1.24.12)
     
 
 
@@ -279,20 +247,182 @@ from IPython.display import display, HTML
 # Display main response
 display(HTML(f'<p style="font-size:20px; color: darkblue;"><strong>Response:</strong> {response.response}</p>'))
 
-# Display excerpts if available
-if hasattr(response, 'source_documents') and response.source_documents:
-    for i, doc in enumerate(response.source_documents):
-        page_info = f"Page {doc.metadata.get('page', 'N/A')}" if doc.metadata else "Unknown page"
-        excerpt = doc.text[:500]  # Limit excerpt length to 500 characters
+# Display excerpts from source_nodes if available
+if hasattr(response, 'source_nodes') and response.source_nodes:
+    for i, node in enumerate(response.source_nodes):
+        page_info = f"Page {node.node.metadata.get('page', 'N/A')}" if node.node.metadata else "Unknown page"
+        excerpt = node.node.text[:500]  # Limit excerpt length to 500 characters for readability
         display(HTML(f'<p style="font-size:16px; color: darkgreen;"><strong>Excerpt from {page_info}:</strong><br>{excerpt}...</p>'))
 else:
     display(HTML("<p style='font-size:16px; color: red;'>No excerpts found in the response.</p>"))
 ```
 
 
-<p style="font-size:20px; color: darkblue;"><strong>Response:</strong> Tire pressure should be checked monthly when the tires are cold, which means the vehicle has been parked for at least three hours or driven less than 1 mile (1.6 km). This practice is important to ensure proper inflation and safety, especially during cold weather when tire pressure can decrease.</p>
+<p style="font-size:20px; color: darkblue;"><strong>Response:</strong> Tire pressure should be checked monthly when the tires are cold. It's also advisable to check the pressure before long trips. Cold tires mean the vehicle has been parked for at least three hours or driven less than 1 mile.</p>
 
 
 
-<p style='font-size:16px; color: red;'>No excerpts found in the response.</p>
+<p style="font-size:16px; color: darkgreen;"><strong>Excerpt from Page 487:</strong><br>485
+uuWhen DrivinguTire Pressure Monitoring System (TPMS) - Required Federal Explanation
+Continued
+Driving
+Tire Pressure Monitoring System (TPMS) - Required 
+Federal Explanation
+Each tire, including the spare (if provided), should be checked 
+monthly when cold and inflated to the inflation pressure 
+recommended by the vehicle manufacturer on the vehicle placard 
+or tire inflation pressure label.
+(If your vehicle has tires of a different size than the size indicated 
+on the vehicle placard or tir...</p>
 
+
+
+<p style="font-size:16px; color: darkgreen;"><strong>Excerpt from Page 638:</strong><br>636
+Maintenance
+Checking and Maintaining Tires
+Checking Tires
+To safely operate your vehicle, your tires must be of the proper type and size, in 
+good condition with adequate tread, and properly inflated.
+■Inflation guidelines
+Properly inflated tires provide the best combination of handling, tread life, and comfort. 
+Refer to the driver’s doorjamb label or specifications page for the specified pressure.
+Underinflated tires wear unevenly, adversely affect handling and fuel economy, and 
+are more ...</p>
+
+
+
+<p style="font-size:16px; color: darkgreen;"><strong>Excerpt from Page 692:</strong><br>690
+uuIf a Tire Goes FlatuTemporarily Repairing a Flat Tire
+Handling the Unexpected
+4. Recheck the air pressure using the gauge 
+on the air compressor.
+u Do not turn the air compressor on to 
+check the pressure.
+5. If the air pressure is:
+• Less than 19 psi (130 kPa):
+Do not add air or continue driving. The 
+leak is too severe. Call for help and have 
+your vehicle towed.
+2 Emergency Towing P. 724
+• 33 psi (230 kPa) or more:
+Continue driving for another five 
+minutes or until you reach the neares...</p>
+
+
+
+```python
+from datetime import datetime, timedelta
+
+# Set the last tire pressure check date to 40 days prior to today's date
+last_check_date = datetime.now() - timedelta(days=40)
+check_interval_days = 30  # Recommended interval for tire pressure checks in days
+
+# Display the last check date and the check interval for verification
+print(f"Today's date: {datetime.now().strftime('%Y-%m-%d')}")
+print(f"Last tire pressure check date: {last_check_date.strftime('%Y-%m-%d')}")
+print(f"Recommended check interval: {check_interval_days} days")
+```
+
+    Today's date: 2024-10-28
+    Last tire pressure check date: 2024-09-18
+    Recommended check interval: 30 days
+    
+
+
+```python
+import os
+import requests
+
+def get_current_temperature(city):
+    """Fetches the current temperature for a given city using WeatherAPI."""
+    api_key = os.getenv("WEATHER_API_KEY")
+    if not api_key:
+        raise ValueError("WEATHER_API_KEY environment variable is not set.")
+    
+    url = f"http://api.weatherapi.com/v1/current.json?key={api_key}&q={city}&aqi=no"
+    response = requests.get(url)
+    if response.status_code == 200:
+        weather_data = response.json()
+        temperature = weather_data['current']['temp_f']
+        return temperature
+    else:
+        print(f"Error fetching weather data: {response.status_code}")
+        return None
+
+# Test the function with "Powell" as the city
+city = "Powell"
+current_temp = get_current_temperature(city)
+if current_temp is not None:
+    print(f"The current temperature in {city} is {current_temp}°F.")
+else:
+    print("Failed to fetch the current temperature.")
+```
+
+    The current temperature in Powell is 48.4°F.
+    
+
+
+```python
+def should_send_reminder(last_check_date, check_interval_days, current_temp, temperature_threshold=32):
+    """Determine if a tire pressure reminder should be sent based on check interval and temperature."""
+    days_since_last_check = (datetime.now() - last_check_date).days
+    print(f"Days since last tire pressure check: {days_since_last_check}")
+    print(f"Current temperature in Powell: {current_temp}°F")
+    
+    # Check if either the check interval has passed or the temperature is below the threshold
+    if days_since_last_check >= check_interval_days or current_temp < temperature_threshold:
+        return True
+    return False
+
+# Test the function with current values
+temperature_threshold = 50  # Set temperature threshold in Fahrenheit
+reminder_needed = should_send_reminder(last_check_date, check_interval_days, current_temp, temperature_threshold)
+
+if reminder_needed:
+    print("Reminder conditions met: Time to check tire pressure.")
+else:
+    print("No reminder needed at this time.")
+```
+
+    Days since last tire pressure check: 40
+    Current temperature in Powell: 48.4°F
+    Reminder conditions met: Time to check tire pressure.
+    
+
+
+```python
+# from twilio.rest import Client
+# import os
+
+# def send_sms_reminder(message, to_phone):
+#     """Sends an SMS reminder via Twilio using API Key SID and Secret."""
+#     api_key_sid = os.getenv("TWILIO_API_KEY_SID")
+#     api_key_secret = os.getenv("TWILIO_API_KEY_SECRET")
+#     account_sid = os.getenv("TWILIO_ACCOUNT_SID")  # Still need the Account SID
+#     from_phone = os.getenv("TWILIO_PHONE_NUMBER")
+    
+#     if not all([api_key_sid, api_key_secret, account_sid, from_phone]):
+#         raise ValueError("Twilio environment variables are not set properly.")
+
+#     client = Client(api_key_sid, api_key_secret, account_sid)
+    
+#     message = client.messages.create(
+#         body=message,
+#         from_=from_phone,
+#         to=to_phone
+#     )
+#     return message.sid
+
+# # Example message content
+# reminder_message = (
+#     f"Reminder: It’s time to check your tire pressure. The temperature in Powell is {current_temp}°F, "
+#     "which can impact tire pressure."
+# )
+
+# # Send SMS if reminder conditions are met
+# if reminder_needed:
+#     sms_sid = send_sms_reminder(reminder_message, os.getenv("USER_PHONE_NUMBER"))
+#     print(f"SMS sent with SID: {sms_sid}")
+# else:
+#     print("No SMS sent; conditions not met.")
+```
