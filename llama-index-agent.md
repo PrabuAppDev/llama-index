@@ -113,7 +113,7 @@ else:
 ```
 
 
-<p style="font-size:20px; color: darkblue;"><strong>Response:</strong> Tire pressure should be checked monthly when the tires are cold. This means the vehicle should have been parked for at least three hours or driven less than 1 mile (1.6 km) before checking the pressure.</p>
+<p style="font-size:20px; color: darkblue;"><strong>Response:</strong> Tire pressure should be checked monthly when the tires are cold. It's also advisable to check the pressure before long trips. Checking when the tires are cold means the vehicle has been parked for at least three hours or driven less than 1 mile.</p>
 
 
 
@@ -200,13 +200,13 @@ display(HTML(f'<p style="font-size:20px">{response.response}</p>'))
     === Calling Function ===
     Calling function: acura_manual with args: {"input": "tire pressure check frequency cold weather"}
     === Function Output ===
-    Tire pressure should be checked monthly when the tires are cold. This means the vehicle should have been parked for at least three hours or driven less than 1 mile (1.6 km) before checking the pressure. Regular checks are especially important in cold weather, as temperatures can cause tire pressure to drop.
+    Tire pressure should be checked monthly when the tires are cold. This means the vehicle should have been parked for at least three hours or driven less than 1 mile (1.6 km) before checking the pressure. Regular checks are especially important in cold weather, as temperatures can affect tire pressure.
     === LLM Response ===
-    Tire pressure should be checked monthly, especially during cold weather. It's best to check the pressure when the tires are cold, meaning the vehicle should have been parked for at least three hours or driven less than 1 mile (1.6 km) before checking. Cold temperatures can cause tire pressure to drop, making regular checks crucial.
+    Tire pressure should be checked monthly, especially during cold weather. It's best to check the pressure when the tires are cold, meaning the vehicle should have been parked for at least three hours or driven less than 1 mile (1.6 km) before checking. Regular checks are crucial in cold weather, as temperatures can significantly affect tire pressure.
     
 
 
-<p style="font-size:20px">Tire pressure should be checked monthly, especially during cold weather. It's best to check the pressure when the tires are cold, meaning the vehicle should have been parked for at least three hours or driven less than 1 mile (1.6 km) before checking. Cold temperatures can cause tire pressure to drop, making regular checks crucial.</p>
+<p style="font-size:20px">Tire pressure should be checked monthly, especially during cold weather. It's best to check the pressure when the tires are cold, meaning the vehicle should have been parked for at least three hours or driven less than 1 mile (1.6 km) before checking. Regular checks are crucial in cold weather, as temperatures can significantly affect tire pressure.</p>
 
 
 # Agentic Architecture Overview
@@ -258,7 +258,7 @@ else:
 ```
 
 
-<p style="font-size:20px; color: darkblue;"><strong>Response:</strong> Tire pressure should be checked monthly when the tires are cold. It's also advisable to check the pressure before long trips. Cold tires mean the vehicle has been parked for at least three hours or driven less than 1 mile.</p>
+<p style="font-size:20px; color: darkblue;"><strong>Response:</strong> Tire pressure should be checked monthly when the tires are cold. This means the vehicle should have been parked for at least three hours or driven less than 1 mile (1.6 km) before checking the pressure.</p>
 
 
 
@@ -358,7 +358,7 @@ else:
     print("Failed to fetch the current temperature.")
 ```
 
-    The current temperature in Powell is 48.4°F.
+    The current temperature in Powell is 46.9°F.
     
 
 
@@ -385,7 +385,7 @@ else:
 ```
 
     Days since last tire pressure check: 40
-    Current temperature in Powell: 48.4°F
+    Current temperature in Powell: 46.9°F
     Reminder conditions met: Time to check tire pressure.
     
 
@@ -426,3 +426,159 @@ else:
 # else:
 #     print("No SMS sent; conditions not met.")
 ```
+
+
+```python
+def send_notification(message, method="email"):
+    """Sends a notification using the specified method (e.g., email, SMS)."""
+    if method == "twilio":
+        # Twilio notification placeholder
+        # This will use the Twilio function created earlier if Twilio integration is set up
+        to_phone = os.getenv("USER_PHONE_NUMBER")
+        send_sms_reminder(message, to_phone)  # Uncomment this if Twilio is configured
+        print(f"Twilio notification sent: {message}")
+        
+    elif method == "email":
+        # Email notification placeholder
+        # Add email integration here (SMTP or another email API)
+        print(f"Email notification sent: {message}")
+        
+    else:
+        print(f"Unknown notification method: {method}")
+```
+
+
+```python
+def tire_pressure_agent_with_openai_v1(city, last_check_date, check_interval_days, temperature_threshold=50):
+    """Agent that recommends tire inflation and sends notifications based on last check date and temperature."""
+    
+    # Get the current temperature for the specified city
+    current_temp = get_current_temperature(city)
+    days_since_last_check = (datetime.now() - last_check_date).days
+
+    # Retrieve relevant information from the owner's manual using the query engine
+    query = "What are the recommendations for checking tire pressure, especially during cold weather?"
+    manual_response = acura_query_engine.query(query)
+
+    # Prepare structured input for OpenAI
+    prompt = f"""
+    Based on the following owner's manual information about tire maintenance:
+    
+    {manual_response.response}
+
+    Current conditions are:
+    - Days since last tire pressure check: {days_since_last_check} days
+    - Current temperature in {city}: {current_temp}°F
+    - Recommended check interval: {check_interval_days} days
+    - Temperature threshold for reminder: {temperature_threshold}°F
+    
+    Provide a detailed recommendation on whether to check or inflate the tires, considering the above context.
+    """
+
+    # Use the new OpenAI client to generate a response
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",  # Adjust model if needed
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    recommendation = response.choices[0].message.content
+
+    # Determine if a notification should be sent
+    if "Immediate Action Required" in recommendation:
+        send_notification(
+            message=f"Tire Pressure Reminder: {recommendation}",
+            method="twilio"  # or "email", depending on the preferred method
+        )
+
+    # Return the content of the response
+    return recommendation
+
+# Test the agent
+city = "Powell"
+temperature_threshold = 50
+recommendation = tire_pressure_agent_with_openai_v1(city, last_check_date, check_interval_days, temperature_threshold)
+print(recommendation)
+```
+
+    Based on the information provided from the owner's manual and the current conditions, the following recommendation is made regarding tire maintenance:
+    
+    ### Recommendation to Check Tire Pressure
+    1. **Days Since Last Check**: It has been **40 days** since the last tire pressure check, which exceeds the recommended check interval of **30 days**. This is an indicator that it is time to check the tire pressure.
+    
+    2. **Current Temperature**: The temperature in Powell is **50.4°F**, which is slightly above the temperature threshold of **50°F** for reminding to check tire pressure. While the temperature isn't significantly higher, it does trigger the context wherein given temperatures can affect tire pressure due to natural air expansion or contraction, particularly when transitioning between warmer and cooler environments.
+    
+    3. **Monthly PSI Loss**: Considering that tires can lose approximately **1–2 psi per month**, after 40 days, it is likely that each tire has lost around 1.33–2.66 psi. This potential loss could therefore bring tire pressures closer to below the manufacturer's recommended levels, particularly if the tires were not adequately inflated before the last check.
+    
+    4. **Spare Tire**: If applicable, be sure to check the spare tire along with the main tires, as it is important to ensure all tires are adequately inflated to avoid potential issues in case of a flat.
+    
+    5. **Cold vs Hot Tire Pressure**: The recommendation to check tire pressure when tires are cold remains pertinent. As noted, checking tire pressure when the tires are hot can yield inaccurate readings (4–6 psi higher), which could mislead your assessment of whether tires need inflation.
+    
+    ### Conclusion:
+    You should **perform a tire pressure check immediately**. Since it has been over a month since your last check and the current temperature is conducive for monitoring tire pressure, this is essential for ensuring your vehicle operates safely and efficiently. If the tire pressure is found to be below the manufacturer's recommended levels, inflating the tires to the correct specification will be necessary for optimal performance and safety.
+    
+
+### Why Pivot to Static Prompting for Tire Pressure Recommendations using Zero-shot
+
+The reason the recommendation keeps changing is likely due to the **non-deterministic nature of the LLM's responses**. While the underlying logic remains the same, language models often generate slightly different outputs each time they are prompted, especially when the temperature is near the threshold or other factors are open to interpretation.
+
+To make the recommendations more consistent and deterministic, we adopted a static approach. Here are the strategies we implemented:
+
+1. **Use Static Prompting with Explicit Instructions**: Adjust the prompt to focus strictly on the factual conditions and response structure. This minimizes variance in the recommendations by reducing the need for nuanced analysis.
+
+2. **Control Temperature and Time Sensitivity**: Instead of asking the LLM to generate nuanced responses for each temperature and time condition, we pass more explicit parameters. For instance, if the temperature is above 50°F, we simply state that it’s suitable for checking pressure, without additional interpretation.
+
+3. **Cache Responses**: To further stabilize responses, we store outputs and only re-run the agent if specific conditions (like temperature or days since the last check) change significantly. This reduces unnecessary re-evaluation, promoting more predictable and consistent recommendations.
+
+
+
+```python
+def tire_pressure_agent_with_notification(city, last_check_date, check_interval_days, temperature_threshold=50):
+    """Agent that recommends tire inflation based on last check date, temperature, and owner's manual, with a deterministic prompt and notification."""
+    
+    # Get the current temperature for the specified city
+    current_temp = get_current_temperature(city)
+    days_since_last_check = (datetime.now() - last_check_date).days
+
+    # Retrieve relevant information from the owner's manual using the query engine
+    query = "What are the recommendations for checking tire pressure, especially during cold weather?"
+    manual_response = acura_query_engine.query(query)
+
+    # Prepare structured input for OpenAI
+    prompt = f"""
+    Based on the owner's manual information:
+    
+    - Last tire pressure check was {days_since_last_check} days ago (recommended interval: {check_interval_days} days).
+    - Current temperature in {city} is {current_temp}°F (reminder threshold: {temperature_threshold}°F).
+    - Manual recommendations for cold weather checks: {manual_response.response}
+    
+    **Instructions**: Provide a recommendation using the following format:
+    1. "Check tire pressure now" if last check exceeds interval, or if temperature is near threshold.
+    2. "Maintain current pressure" if conditions are favorable.
+    """
+
+    # Use the new OpenAI client to generate a response
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",  # Adjust model if needed
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    recommendation = response.choices[0].message.content
+
+    # Check if notification should be sent based on recommendation
+    if "Check tire pressure now" in recommendation:
+        send_notification(
+            message="Tire Pressure Alert: It’s time to check your tire pressure based on current conditions.",
+            method="email"  # or "twilio" if preferred
+        )
+
+    # Return the recommendation
+    return recommendation
+
+# Test the agent with notification
+recommendation = tire_pressure_agent_with_notification(city="Powell", last_check_date=last_check_date, check_interval_days=30, temperature_threshold=50)
+print(recommendation)
+```
+
+    Email notification sent: Tire Pressure Alert: It’s time to check your tire pressure based on current conditions.
+    Check tire pressure now
+    
